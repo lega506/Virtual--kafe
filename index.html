@@ -602,7 +602,7 @@
 </div>
 
 <script>
-    // ПАРОЛЬ ДЛЯ ХОЗЯЙКИ (можно изменить)
+    // ПАРОЛЬ ДЛЯ ХОЗЯЙКИ
     const HOSTESS_PASSWORD = "cafe2024";
     
     // Базовое меню
@@ -623,6 +623,8 @@
     
     let nextId = 13;
     
+    // ============= ФУНКЦИИ РАБОТЫ С МЕНЮ =============
+    
     // Загрузка меню из localStorage
     function loadMenu() {
         const saved = localStorage.getItem("cafeMenu");
@@ -631,16 +633,38 @@
                 const parsed = JSON.parse(saved);
                 MENU = parsed;
                 nextId = Math.max(...MENU.map(d => d.id), 0) + 1;
-            } catch(e) {}
+                console.log("Меню загружено:", MENU.length, "блюд");
+            } catch(e) {
+                console.error("Ошибка загрузки меню:", e);
+            }
+        } else {
+            // Сохраняем базовое меню при первом запуске
+            saveMenu();
+            console.log("Создано базовое меню");
         }
     }
     
+    // Сохранение меню в localStorage
     function saveMenu() {
         localStorage.setItem("cafeMenu", JSON.stringify(MENU));
+        console.log("Меню сохранено:", MENU.length, "блюд");
+        
+        // Обновляем отображение для всех
+        if (typeof renderMenu === 'function') {
+            renderMenu();
+        }
+        if (typeof renderCategories === 'function') {
+            renderCategories();
+        }
     }
     
     // Добавление блюда
     function addDish(name, price, emoji, imageUrl, category, desc) {
+        if (!name || !price) {
+            showNotification("❌ Введите название и цену!", "error");
+            return false;
+        }
+        
         const newDish = {
             id: nextId++,
             name: name,
@@ -650,25 +674,25 @@
             category: category,
             desc: desc || ""
         };
+        
         MENU.push(newDish);
-        saveMenu();
-        renderCategories();
-        renderMenu();
+        saveMenu(); // Сохраняем в localStorage
+        
         showNotification(`✅ Блюдо "${name}" добавлено!`);
+        return true;
     }
     
     // Удаление блюда
     function deleteDish(dishId) {
         if (confirm("Удалить это блюдо из меню?")) {
             MENU = MENU.filter(d => d.id !== dishId);
-            saveMenu();
-            renderCategories();
-            renderMenu();
+            saveMenu(); // Сохраняем изменения
             showNotification("🗑️ Блюдо удалено");
         }
     }
     
-    // Глобальные переменные
+    // ============= ОСТАЛЬНЫЕ ФУНКЦИИ =============
+    
     let currentUser = null;
     let currentRole = null;
     let currentFilter = 'all';
@@ -761,11 +785,9 @@
     }
     
     // Функции для посетителя
-    let currentGuest = null;
     let guestUser = null;
     
     function initGuest(userName) {
-        currentGuest = userName;
         const userData = loadUser(userName);
         guestUser = {
             name: userName,
@@ -784,6 +806,7 @@
     }
     
     function addToCart(dish) {
+        if (!guestUser) return;
         const existing = guestUser.cart.find(item => item.id === dish.id);
         if (existing) {
             existing.quantity++;
@@ -796,6 +819,7 @@
     }
     
     function updateQuantity(id, delta) {
+        if (!guestUser) return;
         const index = guestUser.cart.findIndex(item => item.id === id);
         if (index !== -1) {
             const newQty = guestUser.cart[index].quantity + delta;
@@ -810,6 +834,7 @@
     }
     
     function clearGuestCart() {
+        if (!guestUser) return;
         if (guestUser.cart.length === 0) {
             showNotification("Корзина уже пуста");
             return;
@@ -821,6 +846,7 @@
     }
     
     function placeGuestOrder() {
+        if (!guestUser) return;
         if (guestUser.cart.length === 0) {
             showNotification("❌ Корзина пуста!", "error");
             return;
@@ -851,6 +877,7 @@
     
     function renderCategories() {
         const container = document.getElementById("categoryBar");
+        if (!container) return;
         const categories = getCategories();
         container.innerHTML = categories.map(cat => `
             <button class="cat-btn ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}">${cat}</button>
@@ -867,6 +894,8 @@
     
     function renderMenu() {
         const container = document.getElementById("dishesGrid");
+        if (!container) return;
+        
         let filtered = currentCategory === "Все" ? MENU : MENU.filter(d => d.category === currentCategory);
         
         container.innerHTML = filtered.map(dish => `
@@ -915,8 +944,8 @@
         const totalSpan = document.getElementById("cartTotal");
         
         if (!guestUser || guestUser.cart.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:20px; color:#b5916b;">Корзина пуста</div>`;
-            totalSpan.innerText = "Итого: 0 ₽";
+            if (container) container.innerHTML = `<div style="text-align:center; padding:20px; color:#b5916b;">Корзина пуста</div>`;
+            if (totalSpan) totalSpan.innerText = "Итого: 0 ₽";
             return;
         }
         
@@ -954,6 +983,8 @@
     
     function renderAllOrders() {
         const container = document.getElementById("allOrdersList");
+        if (!container) return;
+        
         let orders = getAllOrders();
         
         if (currentFilter === 'pending') {
@@ -963,7 +994,7 @@
         }
         
         if (orders.length === 0) {
-            container.innerHTML = `<div class="empty-orders" style="text-align:center; padding:50px; color:#b5916b;">📭 Нет заказов</div>`;
+            container.innerHTML = `<div style="text-align:center; padding:50px; color:#b5916b;">📭 Нет заказов</div>`;
             const pendingCount = getAllOrders().filter(o => o.status === 'pending').length;
             document.getElementById("statsBadge").innerHTML = `📊 Заказов: ${getAllOrders().length} (ожидают: ${pendingCount})`;
             return;
@@ -1011,6 +1042,46 @@
     // Переключение режимов
     let selectedRole = 'guest';
     
+    function switchToGuest(userName) {
+        currentRole = 'guest';
+        initGuest(userName);
+        
+        document.getElementById("cartSection").style.display = "block";
+        document.getElementById("ordersPanel").style.display = "none";
+        document.getElementById("addDishForm").style.display = "none";
+        document.getElementById("displayUserRole").innerHTML = "🍕 Посетитель";
+        document.getElementById("displayUserName").innerText = userName;
+        
+        renderGuestCart();
+        renderCategories();
+        renderMenu();
+    }
+    
+    function switchToHostess(userName) {
+        currentRole = 'hostess';
+        currentUser = { name: userName, role: 'hostess' };
+        
+        document.getElementById("cartSection").style.display = "none";
+        document.getElementById("ordersPanel").style.display = "block";
+        document.getElementById("addDishForm").style.display = "block";
+        document.getElementById("displayUserRole").innerHTML = "👩‍🍳 Хозяйка кафе";
+        document.getElementById("displayUserName").innerText = userName;
+        
+        renderCategories();
+        renderMenu();
+        renderAllOrders();
+    }
+    
+    function showNotification(msg, type = "info") {
+        const notif = document.createElement("div");
+        notif.className = "notification";
+        notif.style.background = type === "error" ? "#e74c3c" : "#2ecc71";
+        notif.textContent = msg;
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 2500);
+    }
+    
+    // Обработчики событий
     document.querySelectorAll(".role-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("active"));
@@ -1051,55 +1122,8 @@
         document.getElementById("mainInterface").style.display = "block";
     });
     
-    function switchToGuest(userName) {
-        currentRole = 'guest';
-        initGuest(userName);
-        
-        document.getElementById("cartSection").style.display = "block";
-        document.getElementById("ordersPanel").style.display = "none";
-        document.getElementById("addDishForm").style.display = "none";
-        document.getElementById("displayUserRole").innerHTML = "🍕 Посетитель";
-        
-        renderGuestCart();
-        renderAll();
-    }
-    
-    function switchToHostess(userName) {
-        currentRole = 'hostess';
-        currentUser = { name: userName, role: 'hostess' };
-        
-        document.getElementById("cartSection").style.display = "none";
-        document.getElementById("ordersPanel").style.display = "block";
-        document.getElementById("addDishForm").style.display = "block";
-        document.getElementById("displayUserRole").innerHTML = "👩‍🍳 Хозяйка кафе";
-        
-        renderAll();
-        renderAllOrders();
-    }
-    
-    function renderAll() {
-        if (!currentUser && currentRole !== 'guest') return;
-        if (currentRole === 'guest') {
-            document.getElementById("displayUserName").innerText = guestUser.name;
-        } else {
-            document.getElementById("displayUserName").innerText = currentUser.name;
-        }
-        renderCategories();
-        renderMenu();
-    }
-    
-    function showNotification(msg, type = "info") {
-        const notif = document.createElement("div");
-        notif.className = "notification";
-        notif.style.background = type === "error" ? "#e74c3c" : "#2ecc71";
-        notif.textContent = msg;
-        document.body.appendChild(notif);
-        setTimeout(() => notif.remove(), 2500);
-    }
-    
-    // Обработчики кнопок
     document.getElementById("changeUserBtn").addEventListener("click", () => {
-        if (currentRole === 'guest') saveGuestData();
+        if (currentRole === 'guest' && guestUser) saveGuestData();
         currentUser = null;
         guestUser = null;
         document.getElementById("loginScreen").style.display = "flex";
@@ -1123,18 +1147,18 @@
         const category = document.getElementById("newDishCategory").value;
         const desc = document.getElementById("newDishDesc").value.trim();
         
-        if (!name || !price) {
-            showNotification("❌ Введите название и цену!", "error");
-            return;
+        if (addDish(name, price, emoji, imageUrl, category, desc)) {
+            // Очищаем форму
+            document.getElementById("newDishName").value = "";
+            document.getElementById("newDishPrice").value = "";
+            document.getElementById("newDishEmoji").value = "";
+            document.getElementById("newDishImage").value = "";
+            document.getElementById("newDishDesc").value = "";
+            
+            // Принудительно обновляем отображение
+            renderCategories();
+            renderMenu();
         }
-        
-        addDish(name, price, emoji, imageUrl, category, desc);
-        
-        document.getElementById("newDishName").value = "";
-        document.getElementById("newDishPrice").value = "";
-        document.getElementById("newDishEmoji").value = "";
-        document.getElementById("newDishImage").value = "";
-        document.getElementById("newDishDesc").value = "";
     });
     
     document.querySelectorAll(".filter-btn").forEach(btn => {
