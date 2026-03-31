@@ -2,543 +2,102 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Виртуальное кафе · Администрирование</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виртуальное кафе · GitHub Edition</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Все стили из предыдущей версии */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a472a 0%, #2d5a3b 100%);
             min-height: 100vh;
             padding: 20px;
         }
-
-        .app-wrapper {
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        /* Экран входа */
+        .app-wrapper { max-width: 1600px; margin: 0 auto; }
         .login-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(135deg, #1e3a2a, #0f2a1a);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
         }
-
         .login-card {
-            background: white;
-            border-radius: 40px;
-            padding: 40px 30px;
-            width: 90%;
-            max-width: 450px;
-            text-align: center;
+            background: white; border-radius: 40px; padding: 40px 30px;
+            width: 90%; max-width: 450px; text-align: center;
             box-shadow: 0 25px 50px rgba(0,0,0,0.3);
         }
-
-        .login-card h1 {
-            font-size: 2.5rem;
-            color: #2c5e2e;
-            margin-bottom: 10px;
-        }
-
-        .login-card input, .login-card select {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: 2px solid #e0e0e0;
-            border-radius: 50px;
-            font-size: 1rem;
-            text-align: center;
-        }
-
-        .password-field {
-            display: none;
-        }
-
-        .role-selector {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .role-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 50px;
-            background: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .role-btn.active {
-            background: linear-gradient(135deg, #e67e22, #f39c12);
-            border-color: #e67e22;
-            color: white;
-        }
-
-        .login-btn {
-            background: linear-gradient(135deg, #e67e22, #f39c12);
-            color: white;
-            border: none;
-            padding: 14px 30px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .error-msg {
-            color: #e74c3c;
-            font-size: 0.85rem;
-            margin-top: 10px;
-            display: none;
-        }
-
-        /* Основной интерфейс */
-        .main-interface {
-            display: none;
-        }
-
-        .cafe-header {
-            background: rgba(255,255,245,0.95);
-            border-radius: 30px;
-            padding: 20px 25px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: #fef5e8;
-            padding: 8px 20px;
-            border-radius: 50px;
-        }
-
-        .user-name {
-            font-weight: bold;
-            color: #2c3e2f;
-            font-size: 1.2rem;
-        }
-
-        .user-role {
-            background: #e67e22;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
-
-        .change-user-btn {
-            background: #e67e22;
-            border: none;
-            padding: 6px 15px;
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-        }
-
-        .stats-badge {
-            background: #2c5e2e;
-            color: white;
-            padding: 8px 18px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-        }
-
-        /* Две колонки */
-        .menu-order-layout {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
-        }
-
-        .menu-panel {
-            flex: 1.5;
-            min-width: 280px;
-            background: rgba(255,255,245,0.95);
-            border-radius: 30px;
-            padding: 20px;
-        }
-
-        .orders-panel {
-            flex: 2;
-            min-width: 350px;
-            background: rgba(255,255,245,0.95);
-            border-radius: 30px;
-            padding: 20px;
-            height: fit-content;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-
-        /* Категории */
-        .category-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #eedbbc;
-        }
-
-        .cat-btn {
-            background: #f5ede3;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .cat-btn.active {
-            background: #e67e22;
-            color: white;
-        }
-
-        /* Сетка блюд */
-        .dishes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
-            max-height: 50vh;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-
-        .dish-card {
-            background: white;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.25s;
-            box-shadow: 0 5px 12px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-
-        .dish-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
-        }
-
-        .dish-image {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            background: linear-gradient(135deg, #fef5e8, #fff5e8);
-        }
-
-        .dish-emoji {
-            font-size: 3rem;
-            text-align: center;
-            padding: 40px;
-            background: linear-gradient(135deg, #fef5e8, #fff5e8);
-        }
-
-        .dish-info {
-            padding: 12px;
-        }
-
-        .dish-name {
-            font-weight: 800;
-            font-size: 1rem;
-        }
-
-        .dish-price {
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: #e67e22;
-            margin-top: 5px;
-        }
-
-        .dish-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .delete-dish-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 0.7rem;
-            cursor: pointer;
-        }
-
-        /* Форма добавления блюда */
-        .add-dish-form {
-            background: #fef5e8;
-            border-radius: 20px;
-            padding: 15px;
-            margin-top: 15px;
-            border: 1px solid #eedbbc;
-        }
-
-        .add-dish-form h4 {
-            margin-bottom: 10px;
-            color: #2c5e2e;
-        }
-
-        .add-dish-form input, .add-dish-form select {
-            width: 100%;
-            padding: 8px 12px;
-            margin: 5px 0;
-            border: 1px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 0.9rem;
-        }
-
-        .add-dish-btn {
-            background: #2ecc71;
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 25px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 8px;
-            font-weight: bold;
-        }
-
-        /* Корзина (только для посетителей) */
-        .cart-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #eedbbc;
-        }
-
-        .cart-header {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c5e2e;
-        }
-
-        .cart-items-list {
-            max-height: 250px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-        }
-
-        .cart-item {
-            background: white;
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 3px solid #e67e22;
-        }
-
-        .cart-controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .qty-btn {
-            background: #f0e2d0;
-            border: none;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .cart-total {
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-align: right;
-            margin: 15px 0;
-        }
-
-        .btn-order {
-            background: linear-gradient(135deg, #e67e22, #f39c12);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 8px;
-        }
-
-        .btn-clear {
-            background: #ecf0f1;
-            color: #7f8c8d;
-            border: none;
-            padding: 10px;
-            border-radius: 50px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        /* Стили для заказов */
-        .order-card {
-            background: white;
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 5px solid #e67e22;
-            transition: all 0.2s;
-        }
-
-        .order-card.completed {
-            border-left-color: #2ecc71;
-            background: #f8fff8;
-            opacity: 0.85;
-        }
-
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .order-customer {
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #2c5e2e;
-        }
-
-        .order-date {
-            font-size: 0.7rem;
-            color: #8b7355;
-        }
-
-        .order-status {
-            font-size: 0.7rem;
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            background: #fef3e2;
-            color: #e67e22;
-        }
-
-        .status-completed {
-            background: #d5f0e0;
-            color: #2ecc71;
-        }
-
-        .order-items {
-            font-size: 0.85rem;
-            color: #5a4a38;
-            margin: 10px 0;
-            padding-left: 15px;
-            border-left: 2px solid #f0e2d0;
-        }
-
-        .order-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .order-total {
-            font-weight: bold;
-            color: #e67e22;
-            font-size: 1rem;
-        }
-
-        .complete-order-btn {
-            background: #2ecc71;
-            color: white;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        .notification {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #2ecc71;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            animation: slideIn 0.3s ease;
-            z-index: 1100;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .orders-panel {
-                max-height: none;
-            }
-        }
+        .login-card h1 { font-size: 2.5rem; color: #2c5e2e; margin-bottom: 10px; }
+        .login-card input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #e0e0e0; border-radius: 50px; font-size: 1rem; text-align: center; }
+        .role-selector { display: flex; gap: 15px; margin: 20px 0; }
+        .role-btn { flex: 1; padding: 12px; border: 2px solid #e0e0e0; border-radius: 50px; background: white; cursor: pointer; font-weight: bold; }
+        .role-btn.active { background: linear-gradient(135deg, #e67e22, #f39c12); border-color: #e67e22; color: white; }
+        .login-btn { background: linear-gradient(135deg, #e67e22, #f39c12); color: white; border: none; padding: 14px 30px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .error-msg { color: #e74c3c; font-size: 0.85rem; margin-top: 10px; display: none; }
+        .main-interface { display: none; }
+        .cafe-header { background: rgba(255,255,245,0.95); border-radius: 30px; padding: 20px 25px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .user-info { display: flex; align-items: center; gap: 15px; background: #fef5e8; padding: 8px 20px; border-radius: 50px; }
+        .user-name { font-weight: bold; color: #2c3e2f; font-size: 1.2rem; }
+        .user-role { background: #e67e22; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+        .change-user-btn { background: #e67e22; border: none; padding: 6px 15px; border-radius: 25px; color: white; cursor: pointer; }
+        .menu-order-layout { display: flex; flex-wrap: wrap; gap: 25px; }
+        .menu-panel { flex: 1.5; min-width: 280px; background: rgba(255,255,245,0.95); border-radius: 30px; padding: 20px; }
+        .orders-panel { flex: 2; min-width: 350px; background: rgba(255,255,245,0.95); border-radius: 30px; padding: 20px; max-height: 85vh; overflow-y: auto; }
+        .category-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #eedbbc; padding-bottom: 15px; }
+        .cat-btn { background: #f5ede3; border: none; padding: 8px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; }
+        .cat-btn.active { background: #e67e22; color: white; }
+        .dishes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; max-height: 50vh; overflow-y: auto; margin-bottom: 20px; }
+        .dish-card { background: white; border-radius: 20px; cursor: pointer; transition: all 0.25s; box-shadow: 0 5px 12px rgba(0,0,0,0.08); overflow: hidden; }
+        .dish-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
+        .dish-emoji { font-size: 3rem; text-align: center; padding: 40px; background: linear-gradient(135deg, #fef5e8, #fff5e8); }
+        .dish-info { padding: 12px; }
+        .dish-name { font-weight: 800; font-size: 1rem; }
+        .dish-price { font-weight: 800; font-size: 1.1rem; color: #e67e22; margin-top: 5px; }
+        .cart-section { margin-top: 20px; padding-top: 20px; border-top: 2px solid #eedbbc; }
+        .cart-header { font-size: 1.3rem; font-weight: bold; margin-bottom: 15px; color: #2c5e2e; }
+        .cart-items-list { max-height: 250px; overflow-y: auto; margin-bottom: 15px; }
+        .cart-item { background: white; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid #e67e22; }
+        .cart-controls { display: flex; gap: 8px; align-items: center; }
+        .qty-btn { background: #f0e2d0; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; }
+        .cart-total { font-size: 1.2rem; font-weight: bold; text-align: right; margin: 15px 0; }
+        .btn-order { background: linear-gradient(135deg, #e67e22, #f39c12); color: white; border: none; padding: 12px; border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 8px; }
+        .btn-clear { background: #ecf0f1; color: #7f8c8d; border: none; padding: 10px; border-radius: 50px; cursor: pointer; width: 100%; }
+        .order-card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; border-left: 5px solid #e67e22; }
+        .order-card.completed { border-left-color: #2ecc71; background: #f8fff8; }
+        .order-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+        .order-customer { font-weight: bold; font-size: 1.1rem; color: #2c5e2e; }
+        .order-date { font-size: 0.7rem; color: #8b7355; }
+        .order-status { font-size: 0.7rem; padding: 3px 12px; border-radius: 20px; font-weight: bold; }
+        .status-pending { background: #fef3e2; color: #e67e22; }
+        .status-completed { background: #d5f0e0; color: #2ecc71; }
+        .order-items { font-size: 0.85rem; color: #5a4a38; margin: 10px 0; padding-left: 15px; border-left: 2px solid #f0e2d0; }
+        .order-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .order-total { font-weight: bold; color: #e67e22; font-size: 1rem; }
+        .complete-order-btn { background: #2ecc71; color: white; border: none; padding: 6px 16px; border-radius: 25px; cursor: pointer; }
+        .notification { position: fixed; bottom: 30px; right: 30px; background: #2ecc71; color: white; padding: 12px 24px; border-radius: 50px; animation: slideIn 0.3s ease; z-index: 1100; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @media (max-width: 768px) { .orders-panel { max-height: none; } }
     </style>
 </head>
 <body>
 <div class="app-wrapper">
-    <!-- Экран входа -->
     <div class="login-screen" id="loginScreen">
         <div class="login-card">
             <div class="cafe-icon">🍽️</div>
             <h1>Виртуальное кафе</h1>
             <p style="color: #7f8c8d; margin-bottom: 15px;">Выберите режим и войдите</p>
-            
             <div class="role-selector">
                 <button class="role-btn" data-role="guest">🍕 Посетитель</button>
                 <button class="role-btn hostess" data-role="hostess">👩‍🍳 Хозяйка кафе</button>
             </div>
-            
-            <input type="text" id="userNameInput" placeholder="Введите ваше имя" maxlength="30">
-            
-            <div id="passwordField" class="password-field">
+            <input type="text" id="userNameInput" placeholder="Введите ваше имя">
+            <div id="passwordField" class="password-field" style="display: none;">
                 <input type="password" id="hostessPassword" placeholder="Введите пароль Хозяйки">
             </div>
-            
             <button class="login-btn" id="loginBtn">✨ Войти ✨</button>
             <div class="error-msg" id="loginError">Пожалуйста, введите имя</div>
             <div class="error-msg" id="passwordError" style="display:none;">Неверный пароль!</div>
+            <div class="error-msg" id="githubError" style="display:none; color:#e67e22;">⚠️ Внимание: Для сохранения данных нужен GitHub Token. <br>Данные сохраняются только локально!</div>
         </div>
     </div>
 
-    <!-- Основной интерфейс -->
     <div class="main-interface" id="mainInterface">
         <div class="cafe-header">
             <div class="user-info">
@@ -547,35 +106,12 @@
                 <span class="user-role" id="displayUserRole"></span>
                 <button class="change-user-btn" id="changeUserBtn">Сменить режим</button>
             </div>
-            <div class="stats-badge" id="statsBadge">📊 Статистика</div>
+            <div class="stats-badge" id="statsBadge">📊 Локальное сохранение</div>
         </div>
-
         <div class="menu-order-layout">
-            <!-- Меню -->
             <div class="menu-panel">
                 <div class="category-bar" id="categoryBar"></div>
                 <div class="dishes-grid" id="dishesGrid"></div>
-                
-                <!-- Форма добавления блюда (только для Хозяйки) -->
-                <div id="addDishForm" class="add-dish-form" style="display: none;">
-                    <h4>➕ Добавить новое блюдо</h4>
-                    <input type="text" id="newDishName" placeholder="Название блюда">
-                    <input type="number" id="newDishPrice" placeholder="Цена">
-                    <input type="text" id="newDishEmoji" placeholder="Эмодзи (например: 🍕)">
-                    <input type="text" id="newDishImage" placeholder="Ссылка на фото (URL)">
-                    <select id="newDishCategory">
-                        <option value="Салаты">Салаты</option>
-                        <option value="Супы">Супы</option>
-                        <option value="Горячее">Горячее</option>
-                        <option value="Закуски">Закуски</option>
-                        <option value="Десерты">Десерты</option>
-                        <option value="Напитки">Напитки</option>
-                    </select>
-                    <input type="text" id="newDishDesc" placeholder="Описание (необязательно)">
-                    <button class="add-dish-btn" id="addDishBtn">🍽️ Добавить блюдо</button>
-                </div>
-                
-                <!-- Корзина только для посетителей -->
                 <div id="cartSection" class="cart-section" style="display: none;">
                     <div class="cart-header">🛒 Моя корзина</div>
                     <div id="cartContainer" class="cart-items-list"></div>
@@ -584,29 +120,36 @@
                     <button class="btn-clear" id="clearCartBtn">🗑️ Очистить</button>
                 </div>
             </div>
-
-            <!-- Панель заказов (для Хозяйки) -->
             <div class="orders-panel" id="ordersPanel" style="display: none;">
-                <div class="orders-header" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                    <div class="orders-title">📋 Все заказы посетителей</div>
-                    <div class="filter-buttons" style="display: flex; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <div class="orders-title">📋 Все заказы</div>
+                    <div style="display: flex; gap: 10px;">
                         <button class="filter-btn active" data-filter="all">Все</button>
                         <button class="filter-btn" data-filter="pending">⏳ Ожидают</button>
                         <button class="filter-btn" data-filter="completed">✅ Выполнены</button>
                     </div>
                 </div>
                 <div id="allOrdersList"></div>
+                <div style="margin-top: 20px; padding: 10px; background: #fff5e8; border-radius: 15px; font-size: 0.7rem; text-align: center;">
+                    💡 На GitHub Pages данные сохраняются локально.<br>
+                    Для серверного сохранения используйте Render.com или InfinityFree
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // ПАРОЛЬ ДЛЯ ХОЗЯЙКИ
     const HOSTESS_PASSWORD = "cafe2024";
+    let currentRole = null;
+    let currentGuestName = null;
+    let guestCart = [];
+    let MENU = [];
+    let currentCategory = "Все";
+    let currentFilter = "all";
     
     // Базовое меню
-    let MENU = [
+    const DEFAULT_MENU = [
         { id: 1, name: "Цезарь с курицей", price: 390, category: "Салаты", emoji: "🥗", image: "", desc: "Курица, пармезан" },
         { id: 2, name: "Греческий салат", price: 320, category: "Салаты", emoji: "🥙", image: "", desc: "Фета, оливки" },
         { id: 3, name: "Том Ям", price: 450, category: "Супы", emoji: "🍲", image: "", desc: "Креветки, грибы" },
@@ -621,44 +164,26 @@
         { id: 12, name: "Лимонад", price: 210, category: "Напитки", emoji: "🍹", image: "", desc: "Мятный" }
     ];
     
-    let nextId = 13;
-    
-    // ============= ФУНКЦИИ РАБОТЫ С МЕНЮ =============
-    
-    // Загрузка меню из localStorage
-    function loadMenu() {
-        const saved = localStorage.getItem("cafeMenu");
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                MENU = parsed;
-                nextId = Math.max(...MENU.map(d => d.id), 0) + 1;
-                console.log("Меню загружено:", MENU.length, "блюд");
-            } catch(e) {
-                console.error("Ошибка загрузки меню:", e);
-            }
+    // Загрузка данных из localStorage
+    function loadData() {
+        const savedMenu = localStorage.getItem("cafeMenu");
+        if (savedMenu) {
+            MENU = JSON.parse(savedMenu);
         } else {
-            // Сохраняем базовое меню при первом запуске
-            saveMenu();
-            console.log("Создано базовое меню");
+            MENU = [...DEFAULT_MENU];
+            localStorage.setItem("cafeMenu", JSON.stringify(MENU));
         }
+        
+        renderCategories();
+        renderMenu();
     }
     
-    // Сохранение меню в localStorage
     function saveMenu() {
         localStorage.setItem("cafeMenu", JSON.stringify(MENU));
-        console.log("Меню сохранено:", MENU.length, "блюд");
-        
-        // Обновляем отображение для всех
-        if (typeof renderMenu === 'function') {
-            renderMenu();
-        }
-        if (typeof renderCategories === 'function') {
-            renderCategories();
-        }
+        renderCategories();
+        renderMenu();
     }
     
-    // Добавление блюда
     function addDish(name, price, emoji, imageUrl, category, desc) {
         if (!name || !price) {
             showNotification("❌ Введите название и цену!", "error");
@@ -666,7 +191,7 @@
         }
         
         const newDish = {
-            id: nextId++,
+            id: Date.now(),
             name: name,
             price: parseInt(price),
             emoji: emoji || "🍽️",
@@ -676,192 +201,106 @@
         };
         
         MENU.push(newDish);
-        saveMenu(); // Сохраняем в localStorage
-        
+        saveMenu();
         showNotification(`✅ Блюдо "${name}" добавлено!`);
         return true;
     }
     
-    // Удаление блюда
     function deleteDish(dishId) {
-        if (confirm("Удалить это блюдо из меню?")) {
+        if (confirm("Удалить это блюдо?")) {
             MENU = MENU.filter(d => d.id !== dishId);
-            saveMenu(); // Сохраняем изменения
+            saveMenu();
             showNotification("🗑️ Блюдо удалено");
         }
     }
     
-    // ============= ОСТАЛЬНЫЕ ФУНКЦИИ =============
+    // Заказы
+    let allOrders = [];
     
-    let currentUser = null;
-    let currentRole = null;
-    let currentFilter = 'all';
-    let currentCategory = "Все";
-    
-    const STORAGE_KEY = "virtualCafeAllDataV2";
-    
-    function loadAllData() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            try {
-                return JSON.parse(stored);
-            } catch(e) {
-                return { users: {}, allOrders: [] };
-            }
+    function loadOrders() {
+        const saved = localStorage.getItem("cafeOrders");
+        if (saved) {
+            allOrders = JSON.parse(saved);
+        } else {
+            allOrders = [];
         }
-        return { users: {}, allOrders: [] };
     }
     
-    function saveAllData(data) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    function saveOrders() {
+        localStorage.setItem("cafeOrders", JSON.stringify(allOrders));
     }
     
-    function saveUser(userName, userData) {
-        const data = loadAllData();
-        data.users[userName] = userData;
-        saveAllData(data);
-    }
-    
-    function loadUser(userName) {
-        const data = loadAllData();
-        return data.users[userName] || { cart: [], ordersHistory: [] };
-    }
-    
-    function getAllOrders() {
-        const data = loadAllData();
-        return data.allOrders || [];
-    }
-    
-    function saveAllOrders(orders) {
-        const data = loadAllData();
-        data.allOrders = orders;
-        saveAllData(data);
-    }
-    
-    function addOrder(customerName, orderItems, total) {
-        const orders = getAllOrders();
+    function addOrder(customerName, items, total) {
         const newOrder = {
             id: Date.now(),
-            orderId: `#${Date.now().toString().slice(-6)}`,
+            orderId: "#" + Date.now().toString().slice(-6),
             customerName: customerName,
             date: new Date().toLocaleString(),
-            items: orderItems,
+            items: items,
             total: total,
             status: "pending"
         };
-        orders.unshift(newOrder);
-        saveAllOrders(orders);
-        
-        const userData = loadUser(customerName);
-        userData.ordersHistory = userData.ordersHistory || [];
-        userData.ordersHistory.unshift({
-            id: newOrder.id,
-            date: newOrder.date,
-            items: orderItems,
-            total: total,
-            status: "pending"
-        });
-        saveUser(customerName, userData);
+        allOrders.unshift(newOrder);
+        saveOrders();
         return newOrder;
     }
     
-    function markOrderCompleted(orderId) {
-        const orders = getAllOrders();
-        const orderIndex = orders.findIndex(o => o.id === orderId);
-        if (orderIndex !== -1 && orders[orderIndex].status === "pending") {
-            orders[orderIndex].status = "completed";
-            saveAllOrders(orders);
-            
-            const customerName = orders[orderIndex].customerName;
-            const userData = loadUser(customerName);
-            const userOrderIndex = userData.ordersHistory.findIndex(o => o.id === orderId);
-            if (userOrderIndex !== -1) {
-                userData.ordersHistory[userOrderIndex].status = "completed";
-                saveUser(customerName, userData);
-            }
+    function updateOrderStatus(orderId, status) {
+        const order = allOrders.find(o => o.id == orderId);
+        if (order) {
+            order.status = status;
+            saveOrders();
             return true;
         }
         return false;
     }
     
-    // Функции для посетителя
-    let guestUser = null;
-    
-    function initGuest(userName) {
-        const userData = loadUser(userName);
-        guestUser = {
-            name: userName,
-            cart: userData.cart || [],
-            ordersHistory: userData.ordersHistory || []
-        };
-    }
-    
-    function saveGuestData() {
-        if (guestUser) {
-            saveUser(guestUser.name, {
-                cart: guestUser.cart,
-                ordersHistory: guestUser.ordersHistory
-            });
-        }
-    }
-    
+    // Функции посетителя
     function addToCart(dish) {
-        if (!guestUser) return;
-        const existing = guestUser.cart.find(item => item.id === dish.id);
+        const existing = guestCart.find(item => item.id === dish.id);
         if (existing) {
             existing.quantity++;
         } else {
-            guestUser.cart.push({ ...dish, quantity: 1 });
+            guestCart.push({ ...dish, quantity: 1 });
         }
-        saveGuestData();
         renderGuestCart();
         showNotification(`✅ ${dish.name} добавлен в корзину`);
     }
     
     function updateQuantity(id, delta) {
-        if (!guestUser) return;
-        const index = guestUser.cart.findIndex(item => item.id === id);
+        const index = guestCart.findIndex(item => item.id === id);
         if (index !== -1) {
-            const newQty = guestUser.cart[index].quantity + delta;
+            const newQty = guestCart[index].quantity + delta;
             if (newQty <= 0) {
-                guestUser.cart.splice(index, 1);
+                guestCart.splice(index, 1);
             } else {
-                guestUser.cart[index].quantity = newQty;
+                guestCart[index].quantity = newQty;
             }
-            saveGuestData();
             renderGuestCart();
         }
     }
     
     function clearGuestCart() {
-        if (!guestUser) return;
-        if (guestUser.cart.length === 0) {
-            showNotification("Корзина уже пуста");
-            return;
-        }
-        guestUser.cart = [];
-        saveGuestData();
+        guestCart = [];
         renderGuestCart();
         showNotification("🗑️ Корзина очищена");
     }
     
     function placeGuestOrder() {
-        if (!guestUser) return;
-        if (guestUser.cart.length === 0) {
+        if (guestCart.length === 0) {
             showNotification("❌ Корзина пуста!", "error");
             return;
         }
         
-        const total = guestUser.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const orderItems = guestUser.cart.map(item => ({
+        const total = guestCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const orderItems = guestCart.map(item => ({
             name: item.name,
             quantity: item.quantity,
             price: item.price
         }));
         
-        const newOrder = addOrder(guestUser.name, orderItems, total);
-        guestUser.cart = [];
-        saveGuestData();
+        const newOrder = addOrder(currentGuestName, orderItems, total);
+        guestCart = [];
         renderGuestCart();
         showNotification(`🎉 Заказ ${newOrder.orderId} оформлен! Сумма: ${total} ₽`, "success");
         
@@ -900,17 +339,12 @@
         
         container.innerHTML = filtered.map(dish => `
             <div class="dish-card" data-dish='${JSON.stringify(dish)}'>
-                ${dish.image ? 
-                    `<img class="dish-image" src="${dish.image}" alt="${dish.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : 
-                    `<div class="dish-emoji">${dish.emoji || '🍽️'}</div>`
-                }
+                <div class="dish-emoji">${dish.emoji || '🍽️'}</div>
                 <div class="dish-info">
                     <div class="dish-name">${dish.name}</div>
                     <div class="dish-price">${dish.price} ₽</div>
                     ${currentRole === 'hostess' ? `
-                        <div class="dish-actions">
-                            <button class="delete-dish-btn" data-id="${dish.id}">🗑️ Удалить</button>
-                        </div>
+                        <button class="delete-dish-btn" data-id="${dish.id}" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:15px; margin-top:5px; cursor:pointer;">🗑️ Удалить</button>
                     ` : ''}
                 </div>
             </div>
@@ -922,8 +356,6 @@
                 const dish = JSON.parse(card.dataset.dish);
                 if (currentRole === 'guest') {
                     addToCart(dish);
-                } else {
-                    showNotification("👩‍🍳 Хозяйка не может делать заказы");
                 }
             });
         });
@@ -943,26 +375,23 @@
         const container = document.getElementById("cartContainer");
         const totalSpan = document.getElementById("cartTotal");
         
-        if (!guestUser || guestUser.cart.length === 0) {
-            if (container) container.innerHTML = `<div style="text-align:center; padding:20px; color:#b5916b;">Корзина пуста</div>`;
-            if (totalSpan) totalSpan.innerText = "Итого: 0 ₽";
+        if (guestCart.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:20px; color:#b5916b;">Корзина пуста</div>`;
+            totalSpan.innerText = "Итого: 0 ₽";
             return;
         }
         
         let total = 0;
         let html = "";
-        guestUser.cart.forEach(item => {
+        guestCart.forEach(item => {
             const itemTotal = item.price * item.quantity;
             total += itemTotal;
             html += `
                 <div class="cart-item">
-                    <div>
-                        <strong>${item.name}</strong>
-                        <div style="font-size:0.75rem;">${item.price} ₽ × ${item.quantity}</div>
-                    </div>
+                    <div><strong>${item.name}</strong><br><small>${item.price} ₽ × ${item.quantity}</small></div>
                     <div class="cart-controls">
                         <button class="qty-btn" data-id="${item.id}" data-delta="-1">−</button>
-                        <span style="min-width:25px; text-align:center;">${item.quantity}</span>
+                        <span>${item.quantity}</span>
                         <button class="qty-btn" data-id="${item.id}" data-delta="1">+</button>
                     </div>
                 </div>
@@ -985,8 +414,7 @@
         const container = document.getElementById("allOrdersList");
         if (!container) return;
         
-        let orders = getAllOrders();
-        
+        let orders = [...allOrders];
         if (currentFilter === 'pending') {
             orders = orders.filter(o => o.status === 'pending');
         } else if (currentFilter === 'completed') {
@@ -995,13 +423,11 @@
         
         if (orders.length === 0) {
             container.innerHTML = `<div style="text-align:center; padding:50px; color:#b5916b;">📭 Нет заказов</div>`;
-            const pendingCount = getAllOrders().filter(o => o.status === 'pending').length;
-            document.getElementById("statsBadge").innerHTML = `📊 Заказов: ${getAllOrders().length} (ожидают: ${pendingCount})`;
+            document.getElementById("statsBadge").innerHTML = `📊 Заказов: ${allOrders.length}`;
             return;
         }
         
-        const pendingCount = getAllOrders().filter(o => o.status === 'pending').length;
-        document.getElementById("statsBadge").innerHTML = `📊 Заказов: ${getAllOrders().length} (ожидают: ${pendingCount})`;
+        document.getElementById("statsBadge").innerHTML = `📊 Заказов: ${allOrders.length} | Ожидают: ${allOrders.filter(o => o.status === 'pending').length}`;
         
         container.innerHTML = orders.map(order => {
             const isCompleted = order.status === "completed";
@@ -1031,7 +457,7 @@
             btn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 const orderId = parseInt(btn.dataset.id);
-                if (markOrderCompleted(orderId)) {
+                if (updateOrderStatus(orderId, 'completed')) {
                     renderAllOrders();
                     showNotification(`✅ Заказ отмечен как выполненный!`);
                 }
@@ -1044,11 +470,11 @@
     
     function switchToGuest(userName) {
         currentRole = 'guest';
-        initGuest(userName);
+        currentGuestName = userName;
+        guestCart = [];
         
         document.getElementById("cartSection").style.display = "block";
         document.getElementById("ordersPanel").style.display = "none";
-        document.getElementById("addDishForm").style.display = "none";
         document.getElementById("displayUserRole").innerHTML = "🍕 Посетитель";
         document.getElementById("displayUserName").innerText = userName;
         
@@ -1059,11 +485,9 @@
     
     function switchToHostess(userName) {
         currentRole = 'hostess';
-        currentUser = { name: userName, role: 'hostess' };
         
         document.getElementById("cartSection").style.display = "none";
         document.getElementById("ordersPanel").style.display = "block";
-        document.getElementById("addDishForm").style.display = "block";
         document.getElementById("displayUserRole").innerHTML = "👩‍🍳 Хозяйка кафе";
         document.getElementById("displayUserName").innerText = userName;
         
@@ -1081,20 +505,14 @@
         setTimeout(() => notif.remove(), 2500);
     }
     
-    // Обработчики событий
+    // Обработчики
     document.querySelectorAll(".role-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
             selectedRole = btn.dataset.role;
-            
             const passwordField = document.getElementById("passwordField");
-            if (selectedRole === 'hostess') {
-                passwordField.style.display = "block";
-            } else {
-                passwordField.style.display = "none";
-                document.getElementById("passwordError").style.display = "none";
-            }
+            passwordField.style.display = selectedRole === 'hostess' ? "block" : "none";
         });
     });
     
@@ -1123,65 +541,31 @@
     });
     
     document.getElementById("changeUserBtn").addEventListener("click", () => {
-        if (currentRole === 'guest' && guestUser) saveGuestData();
-        currentUser = null;
-        guestUser = null;
         document.getElementById("loginScreen").style.display = "flex";
         document.getElementById("mainInterface").style.display = "none";
         document.getElementById("userNameInput").value = "";
         document.getElementById("hostessPassword").value = "";
-        document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("active"));
-        document.querySelector(".role-btn[data-role='guest']").classList.add("active");
         selectedRole = 'guest';
         document.getElementById("passwordField").style.display = "none";
+        document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("active"));
+        document.querySelector(".role-btn[data-role='guest']").classList.add("active");
     });
     
     document.getElementById("placeOrderBtn")?.addEventListener("click", placeGuestOrder);
     document.getElementById("clearCartBtn")?.addEventListener("click", clearGuestCart);
-    
-    document.getElementById("addDishBtn")?.addEventListener("click", () => {
-        const name = document.getElementById("newDishName").value.trim();
-        const price = document.getElementById("newDishPrice").value;
-        const emoji = document.getElementById("newDishEmoji").value.trim();
-        const imageUrl = document.getElementById("newDishImage").value.trim();
-        const category = document.getElementById("newDishCategory").value;
-        const desc = document.getElementById("newDishDesc").value.trim();
-        
-        if (addDish(name, price, emoji, imageUrl, category, desc)) {
-            // Очищаем форму
-            document.getElementById("newDishName").value = "";
-            document.getElementById("newDishPrice").value = "";
-            document.getElementById("newDishEmoji").value = "";
-            document.getElementById("newDishImage").value = "";
-            document.getElementById("newDishDesc").value = "";
-            
-            // Принудительно обновляем отображение
-            renderCategories();
-            renderMenu();
-        }
-    });
     
     document.querySelectorAll(".filter-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
             currentFilter = btn.dataset.filter;
-            if (currentRole === 'hostess') {
-                renderAllOrders();
-            }
+            if (currentRole === 'hostess') renderAllOrders();
         });
     });
     
-    document.getElementById("userNameInput").addEventListener("keypress", (e) => {
-        if (e.key === "Enter") document.getElementById("loginBtn").click();
-    });
-    
-    document.getElementById("hostessPassword").addEventListener("keypress", (e) => {
-        if (e.key === "Enter") document.getElementById("loginBtn").click();
-    });
-    
     // Инициализация
-    loadMenu();
+    loadData();
+    loadOrders();
     document.querySelector(".role-btn[data-role='guest']").classList.add("active");
 </script>
 </body>
